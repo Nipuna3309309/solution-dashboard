@@ -754,43 +754,48 @@ function updateCountdown() {
 
 // Download Excel
 function downloadExcel() {
-  window.location.href = '/download-excel';
+  window.location.href = '/Solution List.xlsx';
 }
 
-// Upload Excel
+// Upload Excel - reads locally selected file
 async function uploadExcel(file) {
   if (!file) return;
 
   showLoading(true);
 
-  const formData = new FormData();
-  formData.append('file', file);
-
   try {
-    const response = await fetch('/upload-excel', {
-      method: 'POST',
-      body: formData
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+    allRows = rawRows.map(row => {
+      const normalized = {};
+      Object.keys(row).forEach(key => normalized[key.trim()] = row[key]);
+      return normalized;
     });
 
-    const result = await response.json();
+    filteredRows = [...allRows];
+    lastRefreshAt = Date.now();
+
+    populateFilters();
+    updateAllPages();
+    updateConnectionStatus(true);
+    updateLastRefresh();
 
     showLoading(false);
-
-    if (result.success) {
-      showNotification('File uploaded successfully! Refreshing data...', false);
-      setTimeout(loadData, 500);
-    } else {
-      showNotification(result.error || 'Upload failed', true);
-    }
+    showNotification('File loaded successfully! Dashboard updated.', false);
   } catch (error) {
     showLoading(false);
-    showNotification('Upload failed: ' + error.message, true);
+    showNotification('Failed to load file: ' + error.message, true);
   }
 }
 
 // Logout
 function logout() {
-  window.location.href = '/logout';
+  localStorage.removeItem('dashboard_auth');
+  localStorage.removeItem('dashboard_user');
+  window.location.href = '/login.html';
 }
 
 // Show loading overlay
@@ -831,18 +836,12 @@ function showNotification(message, isError = false) {
   setTimeout(() => notification.remove(), 4000);
 }
 
-// Get username from server
-async function checkAuth() {
-  try {
-    const response = await fetch('/check-auth');
-    const data = await response.json();
-
-    if (data.authenticated) {
-      const userNameEl = $('userName');
-      if (userNameEl) userNameEl.textContent = data.username;
-    }
-  } catch (error) {
-    // Ignore auth check errors (for local development)
+// Get username from localStorage
+function checkAuth() {
+  const username = localStorage.getItem('dashboard_user');
+  if (username) {
+    const userNameEl = $('userName');
+    if (userNameEl) userNameEl.textContent = username;
   }
 }
 

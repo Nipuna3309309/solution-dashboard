@@ -9,3 +9,5 @@ venv/
 Solution_Dashboard.xlsx
 Solution_Dashboard_Dynamic.xlsx
 .claude/
+
+.vercel
