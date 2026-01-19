@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+venv/
+*.log
+.DS_Store
+~$*
+*.pbix
+Solution_Dashboard.xlsx
+Solution_Dashboard_Dynamic.xlsx
+.claude/
