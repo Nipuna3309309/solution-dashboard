@@ -1,0 +1,9 @@
+{
+  "install": "pip install flask",
+  "start": "python server.py",
+  "watch": {
+    "restart": {
+      "include": ["*.py"]
+    }
+  }
+}
