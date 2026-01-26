@@ -7,7 +7,7 @@ const AUTO_REFRESH_MS = 60000;
 // Supabase Configuration
 const SUPABASE_URL = 'https://sbqmjzqwtzvrgujgswhs.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicW1qenF3dHp2cmd1amdzd2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MzAyMzEsImV4cCI6MjA4NTAwNjIzMX0.N1biiymjOz3T_mpGUiogQpsl0ts6PRBO_GwjVgg8cdY';
-const SUPABASE_BUCKET = 'files';
+const SUPABASE_BUCKET = 'Files';
 
 // Column Keys
 const KEYS = {
