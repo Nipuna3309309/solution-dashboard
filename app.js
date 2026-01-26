@@ -4,6 +4,11 @@
 const FILE_NAME = "Solution List.xlsx";
 const AUTO_REFRESH_MS = 60000;
 
+// Supabase Configuration
+const SUPABASE_URL = 'https://sbqmjzqwtzvrgujgswhs.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicW1qenF3dHp2cmd1amdzd2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MzAyMzEsImV4cCI6MjA4NTAwNjIzMX0.N1biiymjOz3T_mpGUiogQpsl0ts6PRBO_GwjVgg8cdY';
+const SUPABASE_BUCKET = 'files';
+
 // Column Keys
 const KEYS = {
   division: "Division",
@@ -77,10 +82,18 @@ function groupBy(rows, key) {
   return groups;
 }
 
-// Data Loading
+// Data Loading - fetches from Supabase Storage
 async function loadData() {
   try {
-    const response = await fetch(FILE_NAME, { cache: "no-store" });
+    // Try to fetch from Supabase Storage first
+    const supabaseFileUrl = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${FILE_NAME}`;
+    let response = await fetch(supabaseFileUrl, { cache: "no-store" });
+
+    // Fallback to local file if Supabase file doesn't exist
+    if (!response.ok) {
+      response = await fetch(FILE_NAME, { cache: "no-store" });
+    }
+
     if (!response.ok) throw new Error("File not found");
 
     const buffer = await response.arrayBuffer();
@@ -752,33 +765,38 @@ function updateCountdown() {
   setText('countdown', Math.ceil(remaining / 1000));
 }
 
-// Download Excel
+// Download Excel from Supabase Storage
 function downloadExcel() {
-  window.location.href = '/Solution List.xlsx';
+  const supabaseFileUrl = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${FILE_NAME}`;
+  window.location.href = supabaseFileUrl;
 }
 
-// Upload Excel - reads locally selected file and saves to server
+// Upload Excel to Supabase Storage
 async function uploadExcel(file) {
   if (!file) return;
 
   showLoading(true);
 
   try {
-    // First, upload the file to the server to persist it
-    const formData = new FormData();
-    formData.append('file', file);
+    // Upload file to Supabase Storage
+    const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${FILE_NAME}`;
 
-    const uploadResponse = await fetch('/upload-excel', {
+    const uploadResponse = await fetch(uploadUrl, {
       method: 'POST',
-      body: formData
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'x-upsert': 'true' // Overwrite if exists
+      },
+      body: file
     });
 
     if (!uploadResponse.ok) {
       const errorData = await uploadResponse.json();
-      throw new Error(errorData.error || 'Failed to save file to server');
+      throw new Error(errorData.message || 'Failed to save file to cloud storage');
     }
 
-    // Then, process the file locally to update the UI immediately
+    // Process the file locally to update the UI immediately
     const buffer = await file.arrayBuffer();
     const workbook = XLSX.read(buffer, { type: "array" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -799,7 +817,7 @@ async function uploadExcel(file) {
     updateLastRefresh();
 
     showLoading(false);
-    showNotification('File uploaded and saved successfully!', false);
+    showNotification('File uploaded and saved to cloud!', false);
   } catch (error) {
     showLoading(false);
     showNotification('Failed to upload file: ' + error.message, true);
