@@ -757,13 +757,28 @@ function downloadExcel() {
   window.location.href = '/Solution List.xlsx';
 }
 
-// Upload Excel - reads locally selected file
+// Upload Excel - reads locally selected file and saves to server
 async function uploadExcel(file) {
   if (!file) return;
 
   showLoading(true);
 
   try {
+    // First, upload the file to the server to persist it
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const uploadResponse = await fetch('/upload-excel', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!uploadResponse.ok) {
+      const errorData = await uploadResponse.json();
+      throw new Error(errorData.error || 'Failed to save file to server');
+    }
+
+    // Then, process the file locally to update the UI immediately
     const buffer = await file.arrayBuffer();
     const workbook = XLSX.read(buffer, { type: "array" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -784,10 +799,10 @@ async function uploadExcel(file) {
     updateLastRefresh();
 
     showLoading(false);
-    showNotification('File loaded successfully! Dashboard updated.', false);
+    showNotification('File uploaded and saved successfully!', false);
   } catch (error) {
     showLoading(false);
-    showNotification('Failed to load file: ' + error.message, true);
+    showNotification('Failed to upload file: ' + error.message, true);
   }
 }
 

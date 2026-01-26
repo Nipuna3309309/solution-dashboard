@@ -142,3 +142,7 @@ def serve_static(filename):
 
 # Vercel handler
 app = app
+
+# Local development server
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
