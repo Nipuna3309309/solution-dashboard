@@ -256,9 +256,32 @@ function animateValue(id, target, decimals) {
 
 // Home Charts
 function updateHomeCharts() {
+  createDivisionChart();
   createStageChart();
-  createSavingsPieChart();
   createFocusChart();
+}
+
+function createDivisionChart() {
+  const ctx = $('divisionChart');
+  if (!ctx) return;
+
+  const groups = groupBy(filteredRows, KEYS.division);
+  const labels = Object.keys(groups).sort();
+
+  const config = {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'SMV Unlock', data: labels.map(l => groups[l].smv), backgroundColor: COLORS.blue, borderRadius: 4 },
+        { label: 'OH Reduction', data: labels.map(l => groups[l].oh), backgroundColor: COLORS.green, borderRadius: 4 },
+        { label: 'Other Savings', data: labels.map(l => groups[l].other), backgroundColor: COLORS.orange, borderRadius: 4 }
+      ]
+    },
+    options: getBarOptions()
+  };
+
+  updateOrCreateChart('divisionChart', 'division', config);
 }
 
 function createStageChart() {
@@ -282,31 +305,6 @@ function createStageChart() {
   };
 
   updateOrCreateChart('stageChart', 'stage', config);
-}
-
-function createSavingsPieChart() {
-  const ctx = $('savingsPieChart');
-  if (!ctx) return;
-
-  const groups = groupBy(filteredRows, KEYS.division);
-  const sorted = Object.entries(groups).sort((a, b) => b[1].total - a[1].total);
-  const labels = sorted.map(s => s[0]);
-
-  const config = {
-    type: 'pie',
-    data: {
-      labels,
-      datasets: [{
-        data: sorted.map(s => s[1].total),
-        backgroundColor: CHART_COLORS.slice(0, labels.length),
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: getPieOptions()
-  };
-
-  updateOrCreateChart('savingsPieChart', 'savingsPie', config);
 }
 
 function createFocusChart() {
