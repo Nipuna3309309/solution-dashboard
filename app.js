@@ -256,33 +256,9 @@ function animateValue(id, target, decimals) {
 
 // Home Charts
 function updateHomeCharts() {
-  createDivisionChart();
   createStageChart();
   createSavingsPieChart();
   createFocusChart();
-}
-
-function createDivisionChart() {
-  const ctx = $('divisionChart');
-  if (!ctx) return;
-
-  const groups = groupBy(filteredRows, KEYS.division);
-  const labels = Object.keys(groups).sort();
-
-  const config = {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'SMV Unlock', data: labels.map(l => groups[l].smv), backgroundColor: COLORS.blue, borderRadius: 4 },
-        { label: 'OH Reduction', data: labels.map(l => groups[l].oh), backgroundColor: COLORS.green, borderRadius: 4 },
-        { label: 'Other Savings', data: labels.map(l => groups[l].other), backgroundColor: COLORS.orange, borderRadius: 4 }
-      ]
-    },
-    options: getBarOptions()
-  };
-
-  updateOrCreateChart('divisionChart', 'division', config);
 }
 
 function createStageChart() {
