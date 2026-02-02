@@ -3,48 +3,525 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solution Savings Analytics | Power BI Dashboard</title>
+  <title>MAS Solution Savings Analytics</title>
   <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
-    // Auth check
     if (localStorage.getItem('dashboard_auth') !== 'true') {
       window.location.href = '/login.html';
     }
   </script>
+  <style>
+    /* 3D Scene Container */
+    .scene-3d {
+      perspective: 1000px;
+      perspective-origin: 50% 50%;
+    }
+
+    /* ========== 3D FLOATING SHAPES ========== */
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .shape-3d {
+      position: absolute;
+      transform-style: preserve-3d;
+      animation: float3D 20s ease-in-out infinite;
+    }
+
+    /* 3D Cube */
+    .cube {
+      width: 60px;
+      height: 60px;
+      transform-style: preserve-3d;
+      animation: rotateCube 15s linear infinite;
+    }
+
+    .cube-face {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border: 2px solid rgba(96, 165, 250, 0.3);
+      background: rgba(96, 165, 250, 0.08);
+      backdrop-filter: blur(5px);
+    }
+
+    .cube-face.front  { transform: translateZ(30px); }
+    .cube-face.back   { transform: rotateY(180deg) translateZ(30px); }
+    .cube-face.right  { transform: rotateY(90deg) translateZ(30px); }
+    .cube-face.left   { transform: rotateY(-90deg) translateZ(30px); }
+    .cube-face.top    { transform: rotateX(90deg) translateZ(30px); }
+    .cube-face.bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+    .shape-3d:nth-child(1) {
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape-3d:nth-child(2) {
+      top: 60%;
+      right: 8%;
+      animation-delay: -5s;
+    }
+
+    .shape-3d:nth-child(3) {
+      bottom: 20%;
+      left: 5%;
+      animation-delay: -10s;
+    }
+
+    @keyframes rotateCube {
+      0% { transform: rotateX(0deg) rotateY(0deg); }
+      100% { transform: rotateX(360deg) rotateY(360deg); }
+    }
+
+    @keyframes float3D {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-30px) translateX(15px); }
+      50% { transform: translateY(-15px) translateX(-10px); }
+      75% { transform: translateY(-40px) translateX(5px); }
+    }
+
+    /* 3D Ring */
+    .ring-3d {
+      width: 80px;
+      height: 80px;
+      border: 4px solid rgba(167, 139, 250, 0.4);
+      border-radius: 50%;
+      transform-style: preserve-3d;
+      animation: rotateRing 12s linear infinite;
+    }
+
+    .ring-3d::before,
+    .ring-3d::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 4px solid rgba(244, 114, 182, 0.3);
+      border-radius: 50%;
+      top: -4px;
+      left: -4px;
+    }
+
+    .ring-3d::before {
+      transform: rotateX(60deg);
+    }
+
+    .ring-3d::after {
+      transform: rotateY(60deg);
+      border-color: rgba(34, 211, 238, 0.3);
+    }
+
+    @keyframes rotateRing {
+      0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+      100% { transform: rotateX(360deg) rotateY(180deg) rotateZ(360deg); }
+    }
+
+    /* 3D Pyramid */
+    .pyramid-3d {
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+      animation: rotatePyramid 18s linear infinite;
+      position: relative;
+    }
+
+    .pyramid-face {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-bottom: 50px solid rgba(74, 222, 128, 0.2);
+      transform-origin: 50% 100%;
+    }
+
+    .pyramid-face:nth-child(1) { transform: rotateY(0deg) rotateX(30deg) translateY(-25px); }
+    .pyramid-face:nth-child(2) { transform: rotateY(90deg) rotateX(30deg) translateY(-25px); }
+    .pyramid-face:nth-child(3) { transform: rotateY(180deg) rotateX(30deg) translateY(-25px); }
+    .pyramid-face:nth-child(4) { transform: rotateY(270deg) rotateX(30deg) translateY(-25px); }
+
+    @keyframes rotatePyramid {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+
+    /* ========== 3D SEWING MACHINE ========== */
+    .sewing-machine-3d {
+      position: relative;
+      width: 200px;
+      height: 150px;
+      transform-style: preserve-3d;
+      transform: rotateX(-15deg) rotateY(-25deg);
+      animation: machineFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes machineFloat {
+      0%, 100% { transform: rotateX(-15deg) rotateY(-25deg) translateY(0); }
+      50% { transform: rotateX(-12deg) rotateY(-20deg) translateY(-10px); }
+    }
+
+    .machine-base-3d {
+      position: absolute;
+      width: 180px;
+      height: 20px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      bottom: 0;
+      left: 10px;
+      transform: translateZ(0);
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .machine-base-3d::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      transform: translateZ(30px);
+      border-radius: 4px;
+    }
+
+    .machine-base-3d::after {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 100%;
+      background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+      right: 0;
+      transform: rotateY(90deg) translateZ(15px) translateX(15px);
+    }
+
+    .machine-body-3d {
+      position: absolute;
+      width: 140px;
+      height: 70px;
+      background: linear-gradient(145deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+      bottom: 20px;
+      left: 20px;
+      transform: translateZ(0);
+      border-radius: 8px 8px 4px 4px;
+      box-shadow:
+        inset 0 5px 15px rgba(255,255,255,0.2),
+        inset 0 -5px 15px rgba(0,0,0,0.2),
+        0 15px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .machine-body-3d::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%);
+      transform: translateZ(35px);
+      border-radius: 8px 8px 4px 4px;
+    }
+
+    .machine-head-3d {
+      position: absolute;
+      width: 50px;
+      height: 60px;
+      background: linear-gradient(145deg, #93c5fd 0%, #60a5fa 100%);
+      bottom: 90px;
+      right: 30px;
+      transform: translateZ(10px);
+      border-radius: 6px 12px 4px 4px;
+      box-shadow:
+        inset 0 3px 10px rgba(255,255,255,0.3),
+        0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+
+    .machine-head-3d::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, #bfdbfe 0%, #93c5fd 100%);
+      transform: translateZ(25px);
+      border-radius: 6px 12px 4px 4px;
+    }
+
+    .machine-wheel-3d {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(145deg, #f1f5f9 0%, #cbd5e1 100%);
+      border-radius: 50%;
+      bottom: 105px;
+      right: 25px;
+      transform: translateZ(30px);
+      box-shadow:
+        inset 0 3px 8px rgba(0,0,0,0.2),
+        0 5px 15px rgba(0,0,0,0.3);
+      animation: wheelSpin3D 2s linear infinite;
+    }
+
+    .machine-wheel-3d::before {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #475569;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .machine-wheel-3d::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px solid #94a3b8;
+      border-radius: 50%;
+      box-sizing: border-box;
+    }
+
+    @keyframes wheelSpin3D {
+      from { transform: translateZ(30px) rotate(0deg); }
+      to { transform: translateZ(30px) rotate(360deg); }
+    }
+
+    .machine-needle-3d {
+      position: absolute;
+      width: 4px;
+      height: 35px;
+      background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+      bottom: 55px;
+      right: 45px;
+      transform: translateZ(30px);
+      border-radius: 0 0 2px 2px;
+      animation: needleMove3D 0.5s ease-in-out infinite;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    }
+
+    @keyframes needleMove3D {
+      0%, 100% { height: 35px; bottom: 55px; }
+      50% { height: 45px; bottom: 45px; }
+    }
+
+    .machine-thread-3d {
+      position: absolute;
+      width: 15px;
+      height: 25px;
+      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+      border-radius: 4px;
+      bottom: 130px;
+      left: 60px;
+      transform: translateZ(20px);
+      box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .machine-fabric-3d {
+      position: absolute;
+      width: 80px;
+      height: 30px;
+      background: linear-gradient(90deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+      bottom: 20px;
+      left: 30px;
+      transform: translateZ(35px) skewX(-5deg);
+      border-radius: 2px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      animation: fabricMove3D 3s ease-in-out infinite;
+    }
+
+    @keyframes fabricMove3D {
+      0%, 100% { transform: translateZ(35px) skewX(-5deg) translateX(0); }
+      50% { transform: translateZ(35px) skewX(-5deg) translateX(-8px); }
+    }
+
+    /* 3D Welcome Banner */
+    .welcome-banner-3d {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    .welcome-banner-3d::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+      transform: rotate(-15deg);
+    }
+
+    .welcome-content h2 {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .welcome-content p {
+      color: rgba(255,255,255,0.7);
+      font-size: 16px;
+      max-width: 450px;
+    }
+
+    .machine-container {
+      transform-style: preserve-3d;
+      perspective: 800px;
+    }
+
+    /* 3D Card Hover Effects */
+    .kpi-card {
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-10px) rotateX(5deg) rotateY(-5deg);
+    }
+
+    .chart-tile, .mini-chart-tile {
+      transform-style: preserve-3d;
+      transition: transform 0.4s ease;
+    }
+
+    .chart-tile:hover, .mini-chart-tile:hover {
+      transform: translateY(-5px) rotateX(2deg);
+    }
+
+    /* 3D Floating Icons */
+    .floating-icon-3d {
+      position: absolute;
+      transform-style: preserve-3d;
+      animation: iconFloat3D 8s ease-in-out infinite;
+    }
+
+    .floating-icon-3d svg {
+      width: 40px;
+      height: 40px;
+      fill: rgba(255,255,255,0.1);
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+    }
+
+    @keyframes iconFloat3D {
+      0%, 100% { transform: translateY(0) rotateY(0deg); }
+      50% { transform: translateY(-20px) rotateY(180deg); }
+    }
+
+    /* 3D Stat Cards */
+    .drill-stat {
+      transform-style: preserve-3d;
+      transition: transform 0.4s ease;
+    }
+
+    .drill-stat:hover {
+      transform: translateY(-8px) rotateX(5deg) scale(1.02);
+    }
+
+    /* Hide shapes on mobile */
+    @media (max-width: 1200px) {
+      .floating-shapes { display: none; }
+      .machine-container { display: none; }
+    }
+  </style>
 </head>
 <body>
+  <!-- Floating Orbs Background -->
+  <div class="floating-orb orb-1"></div>
+  <div class="floating-orb orb-2"></div>
+  <div class="floating-orb orb-3"></div>
+
+  <!-- 3D Floating Shapes -->
+  <div class="floating-shapes">
+    <!-- 3D Cube -->
+    <div class="shape-3d" style="top: 15%; left: 8%;">
+      <div class="cube">
+        <div class="cube-face front"></div>
+        <div class="cube-face back"></div>
+        <div class="cube-face right"></div>
+        <div class="cube-face left"></div>
+        <div class="cube-face top"></div>
+        <div class="cube-face bottom"></div>
+      </div>
+    </div>
+
+    <!-- 3D Ring -->
+    <div class="shape-3d" style="top: 50%; right: 5%;">
+      <div class="ring-3d"></div>
+    </div>
+
+    <!-- 3D Pyramid -->
+    <div class="shape-3d" style="bottom: 15%; left: 12%;">
+      <div class="pyramid-3d">
+        <div class="pyramid-face"></div>
+        <div class="pyramid-face"></div>
+        <div class="pyramid-face"></div>
+        <div class="pyramid-face"></div>
+      </div>
+    </div>
+
+    <!-- Another Cube -->
+    <div class="shape-3d" style="top: 70%; right: 15%;">
+      <div class="cube" style="width: 40px; height: 40px;">
+        <div class="cube-face front" style="width: 40px; height: 40px; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.08);"></div>
+        <div class="cube-face back" style="width: 40px; height: 40px; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.08);"></div>
+        <div class="cube-face right" style="width: 40px; height: 40px; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.08);"></div>
+        <div class="cube-face left" style="width: 40px; height: 40px; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.08);"></div>
+        <div class="cube-face top" style="width: 40px; height: 40px; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.08);"></div>
+        <div class="cube-face bottom" style="width: 40px; height: 40px; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.08);"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="powerbi-container">
-    <!-- Top Navigation Bar -->
+    <!-- Header -->
     <header class="powerbi-header">
       <div class="header-left">
         <div class="powerbi-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="1" y="6" width="5" height="14" rx="1" fill="#F2C811"/>
-            <rect x="8" y="3" width="5" height="17" rx="1" fill="#F2C811"/>
-            <rect x="15" y="8" width="5" height="12" rx="1" fill="#F2C811"/>
-          </svg>
-          <span class="logo-text">Solution Savings Analytics</span>
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+          </div>
+          <span class="logo-text">MAS Solution Analytics</span>
         </div>
       </div>
       <div class="header-center">
         <div class="view-toggle">
           <button class="view-btn active" data-view="reading">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            Reading view
+            Dashboard
           </button>
         </div>
       </div>
       <div class="header-right">
-        <button class="header-btn" id="refreshBtn" title="Refresh Data">
+        <button class="header-btn" id="refreshBtn" title="Refresh">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
         </button>
-        <button class="header-btn download-btn" id="downloadExcel" title="Download Excel">
+        <button class="header-btn download-btn" id="downloadExcel" title="Download">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
           <span class="btn-text">Download</span>
         </button>
-        <label class="header-btn upload-btn" id="uploadExcel" title="Upload Excel">
+        <label class="header-btn upload-btn" id="uploadExcel" title="Upload">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
           <span class="btn-text">Upload</span>
           <input type="file" id="fileInput" accept=".xlsx" style="display:none">
@@ -54,7 +531,7 @@
         </button>
         <div class="connection-status" id="connectionStatus">
           <span class="status-indicator"></span>
-          <span class="status-text">Connected</span>
+          <span class="status-text">Live</span>
         </div>
         <div class="user-menu">
           <span class="user-name" id="userName">User</span>
@@ -65,30 +542,29 @@
       </div>
     </header>
 
-    <!-- Page Tabs -->
+    <!-- Tabs -->
     <nav class="powerbi-tabs">
       <button class="tab-btn active" data-page="home">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         Home
       </button>
       <button class="tab-btn" data-page="matrix">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3v18h18V3H3zm8 16H5v-6h6v6zm0-8H5V5h6v6zm8 8h-6v-6h6v6zm0-8h-6V5h6v6z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3v18h18V3H3zm8 16H5v-6h6v6zm0-8H5V5h6v6zm8 8h-6v-6h6v6zm0-8h-6V5h6v6z"/></svg>
         Matrix
       </button>
       <button class="tab-btn" data-page="summary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
         Summary
       </button>
       <button class="tab-btn" data-page="drillthrough">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
         Drill Through
       </button>
-      <div class="tab-indicator"></div>
     </nav>
 
-    <!-- Main Content Area -->
+    <!-- Content -->
     <div class="powerbi-content">
-      <!-- Filters Panel -->
+      <!-- Filters -->
       <aside class="filters-panel" id="filtersPanel">
         <div class="filters-header">
           <h3>Filters</h3>
@@ -97,41 +573,53 @@
         <div class="filter-section">
           <label class="filter-label">Division</label>
           <select id="divisionFilter" class="filter-select">
-            <option value="">All</option>
+            <option value="">All Divisions</option>
           </select>
         </div>
         <div class="filter-section">
           <label class="filter-label">Stage</label>
           <select id="stageFilter" class="filter-select">
-            <option value="">All</option>
+            <option value="">All Stages</option>
           </select>
         </div>
         <div class="filter-section">
           <label class="filter-label">Focus Area</label>
           <select id="focusFilter" class="filter-select">
-            <option value="">All</option>
+            <option value="">All Areas</option>
           </select>
         </div>
         <div class="filter-section">
           <label class="filter-label">Search</label>
-          <input type="text" id="searchFilter" class="filter-input" placeholder="Solution name...">
+          <input type="text" id="searchFilter" class="filter-input" placeholder="Search solutions...">
         </div>
         <div class="filter-info">
           <span id="filterCount">Showing all solutions</span>
         </div>
       </aside>
 
-      <!-- Pages Container -->
+      <!-- Pages -->
       <main class="pages-container">
-
-        <!-- HOME PAGE -->
+        <!-- HOME -->
         <section class="page active" id="page-home">
-          <div class="page-header">
-            <h1>Solution Savings Overview</h1>
-            <p class="page-subtitle">Real-time analytics dashboard powered by Solution List.xlsx</p>
+          <!-- 3D Welcome Banner with Sewing Machine -->
+          <div class="welcome-banner-3d">
+            <div class="welcome-content">
+              <h2>Solution Savings Overview</h2>
+              <p>Track and analyze your manufacturing solutions with real-time 3D analytics powered by advanced data visualization.</p>
+            </div>
+            <div class="machine-container">
+              <div class="sewing-machine-3d">
+                <div class="machine-base-3d"></div>
+                <div class="machine-body-3d"></div>
+                <div class="machine-head-3d"></div>
+                <div class="machine-wheel-3d"></div>
+                <div class="machine-needle-3d"></div>
+                <div class="machine-thread-3d"></div>
+                <div class="machine-fabric-3d"></div>
+              </div>
+            </div>
           </div>
 
-          <!-- KPI Cards -->
           <div class="kpi-row">
             <div class="kpi-card blue">
               <div class="kpi-visual">
@@ -180,12 +668,11 @@
             </div>
           </div>
 
-          <!-- Charts Row -->
           <div class="charts-grid">
             <div class="chart-tile wide">
               <div class="tile-header">
                 <h3>Division Performance</h3>
-                <span class="tile-subtitle">SMV, OH Reduction & Other Savings by Division</span>
+                <span class="tile-subtitle">SMV, OH & Other by Division</span>
               </div>
               <div class="tile-body">
                 <canvas id="divisionChart"></canvas>
@@ -194,7 +681,7 @@
             <div class="chart-tile">
               <div class="tile-header">
                 <h3>Stage Distribution</h3>
-                <span class="tile-subtitle">Solutions by development stage</span>
+                <span class="tile-subtitle">By development stage</span>
               </div>
               <div class="tile-body">
                 <canvas id="stageChart"></canvas>
@@ -206,7 +693,7 @@
             <div class="chart-tile wide">
               <div class="tile-header">
                 <h3>Focus Area Analysis</h3>
-                <span class="tile-subtitle">Savings by technology focus</span>
+                <span class="tile-subtitle">Savings by technology</span>
               </div>
               <div class="tile-body">
                 <canvas id="focusChart"></canvas>
@@ -215,11 +702,11 @@
           </div>
         </section>
 
-        <!-- MATRIX PAGE -->
+        <!-- MATRIX -->
         <section class="page" id="page-matrix">
           <div class="page-header">
             <h1>Stage x Focus Area Matrix</h1>
-            <p class="page-subtitle">Click any cell to drill through to solution details</p>
+            <p class="page-subtitle">Click any cell to drill through</p>
           </div>
 
           <div class="matrix-container">
@@ -237,20 +724,15 @@
             </div>
           </div>
 
-          <!-- Mini Charts on Matrix Page -->
           <div class="matrix-charts">
             <div class="mini-chart-tile">
-              <div class="tile-header">
-                <h3>By Stage</h3>
-              </div>
+              <div class="tile-header"><h3>By Stage</h3></div>
               <div class="tile-body small">
                 <canvas id="matrixStageChart"></canvas>
               </div>
             </div>
             <div class="mini-chart-tile">
-              <div class="tile-header">
-                <h3>By Focus Area</h3>
-              </div>
+              <div class="tile-header"><h3>By Focus Area</h3></div>
               <div class="tile-body small">
                 <canvas id="matrixFocusChart"></canvas>
               </div>
@@ -258,15 +740,14 @@
           </div>
         </section>
 
-        <!-- SUMMARY PAGE -->
+        <!-- SUMMARY -->
         <section class="page" id="page-summary">
           <div class="page-header">
             <h1>Division Summary & Rankings</h1>
-            <p class="page-subtitle">Performance analysis across all divisions</p>
+            <p class="page-subtitle">Performance across all divisions</p>
           </div>
 
           <div class="summary-grid">
-            <!-- Top Performers Card -->
             <div class="summary-tile rankings">
               <div class="tile-header">
                 <h3>Top Performing Divisions</h3>
@@ -290,7 +771,6 @@
               </div>
             </div>
 
-            <!-- Key Insights -->
             <div class="summary-tile insights">
               <div class="tile-header">
                 <h3>Key Insights</h3>
@@ -312,7 +792,7 @@
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
                     </div>
                     <div class="insight-info">
-                      <span class="insight-label">Best SMV Unlock</span>
+                      <span class="insight-label">Best SMV</span>
                       <span class="insight-value" id="insightBestSmv">-</span>
                     </div>
                   </div>
@@ -321,7 +801,7 @@
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                     </div>
                     <div class="insight-info">
-                      <span class="insight-label">Best OH Reduction</span>
+                      <span class="insight-label">Best OH</span>
                       <span class="insight-value" id="insightBestOh">-</span>
                     </div>
                   </div>
@@ -357,20 +837,15 @@
             </div>
           </div>
 
-          <!-- Summary Charts -->
           <div class="charts-grid">
             <div class="chart-tile">
-              <div class="tile-header">
-                <h3>Division Comparison</h3>
-              </div>
+              <div class="tile-header"><h3>Division Comparison</h3></div>
               <div class="tile-body">
                 <canvas id="summaryBarChart"></canvas>
               </div>
             </div>
             <div class="chart-tile">
-              <div class="tile-header">
-                <h3>Savings Breakdown</h3>
-              </div>
+              <div class="tile-header"><h3>Savings Breakdown</h3></div>
               <div class="tile-body">
                 <canvas id="summaryPieChart"></canvas>
               </div>
@@ -378,7 +853,7 @@
           </div>
         </section>
 
-        <!-- DRILL THROUGH PAGE -->
+        <!-- DRILL THROUGH -->
         <section class="page" id="page-drillthrough">
           <div class="page-header">
             <div class="drillthrough-header">
@@ -386,14 +861,13 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
                 Back
               </button>
-              <div class="drillthrough-title">
+              <div>
                 <h1 id="drillTitle">Solution Details</h1>
-                <p class="page-subtitle" id="drillSubtitle">Select a cell from Matrix page or click a division to drill through</p>
+                <p class="page-subtitle" id="drillSubtitle">Select from Matrix to view details</p>
               </div>
             </div>
           </div>
 
-          <!-- Drill Through Stats -->
           <div class="drill-stats" id="drillStats">
             <div class="drill-stat blue">
               <span class="drill-stat-value" id="drillCount">0</span>
@@ -417,7 +891,6 @@
             </div>
           </div>
 
-          <!-- Drill Through Table -->
           <div class="drill-table-container">
             <div class="tile-header">
               <h3>Solution List</h3>
@@ -442,7 +915,6 @@
             </div>
           </div>
 
-          <!-- Drill Charts -->
           <div class="drill-charts">
             <div class="mini-chart-tile">
               <div class="tile-header"><h3>By Division</h3></div>
@@ -458,17 +930,17 @@
             </div>
           </div>
         </section>
-
       </main>
     </div>
 
     <!-- Footer -->
     <footer class="powerbi-footer">
       <div class="footer-left">
-        <span class="last-refresh">Last refreshed: <span id="lastRefresh">-</span></span>
+        <span>MAS Solution Analytics</span>
+        <span style="margin-left: 20px;">Last refreshed: <span id="lastRefresh">-</span></span>
       </div>
       <div class="footer-right">
-        <span class="auto-refresh">Auto-refresh in <span id="countdown">60</span>s</span>
+        <span>Auto-refresh in <span id="countdown">60</span>s</span>
       </div>
     </footer>
   </div>
