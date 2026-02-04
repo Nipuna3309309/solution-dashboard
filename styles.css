@@ -20,8 +20,8 @@
 
   /* Text Colors */
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-muted: rgba(255, 255, 255, 0.75);
 
   /* Shadows */
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -321,7 +321,7 @@ body::before {
   background: transparent;
   border: none;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -412,7 +412,7 @@ body::before {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--text-muted);
+  color: #ffffff;
   margin-bottom: 8px;
 }
 
@@ -449,7 +449,7 @@ body::before {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #ffffff;
   text-align: center;
   margin-top: 8px;
 }
@@ -498,7 +498,7 @@ body::before {
 
 .page-subtitle {
   font-size: 15px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* ==================== KPI CARDS - Glass ==================== */
@@ -585,7 +585,7 @@ body::before {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.85);
   margin-top: 6px;
 }
 
@@ -624,14 +624,15 @@ body::before {
 }
 
 .tile-header h3 {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .tile-subtitle {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .tile-body {
@@ -672,7 +673,7 @@ body::before {
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #ffffff;
   font-weight: 500;
 }
 
@@ -708,7 +709,7 @@ body::before {
   background: var(--glass-bg-dark);
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -826,7 +827,7 @@ body::before {
   text-align: left;
   font-size: 14px;
   border-bottom: 1px solid var(--glass-border);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .rankings-table th {
@@ -835,7 +836,7 @@ body::before {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
+  color: #ffffff;
 }
 
 .rankings-table tbody tr {
@@ -925,7 +926,7 @@ body::before {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
 }
 
@@ -1014,7 +1015,7 @@ body::before {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
   margin-top: 6px;
 }
@@ -1030,7 +1031,7 @@ body::before {
 
 .record-count {
   font-size: 12px;
-  color: var(--text-muted);
+  color: #ffffff;
   background: var(--glass-bg);
   padding: 6px 14px;
   border-radius: 50px;
@@ -1055,7 +1056,7 @@ body::before {
   text-align: left;
   font-size: 13px;
   border-bottom: 1px solid var(--glass-border);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .drill-table th {
@@ -1064,7 +1065,7 @@ body::before {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--text-muted);
+  color: #ffffff;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -1095,7 +1096,7 @@ body::before {
   justify-content: space-between;
   padding: 0 28px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* ==================== SCROLLBAR ==================== */

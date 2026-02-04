@@ -656,12 +656,12 @@ function getBarOptions() {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 11 } } },
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 12 }, color: '#ffffff' } },
       tooltip: { backgroundColor: '#252423', padding: 12, cornerRadius: 4 }
     },
     scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-      y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } } }
+      x: { grid: { display: false }, ticks: { font: { size: 12 }, color: '#ffffff' } },
+      y: { grid: { color: 'rgba(255, 255, 255, 0.15)' }, ticks: { font: { size: 12 }, color: '#ffffff' } }
     }
   };
 }
@@ -672,7 +672,7 @@ function getDoughnutOptions() {
     maintainAspectRatio: false,
     cutout: '55%',
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } },
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 12 }, color: '#ffffff' } },
       tooltip: {
         backgroundColor: '#252423',
         callbacks: {
@@ -692,7 +692,7 @@ function getPieOptions() {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 10 } } },
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 11 }, color: '#ffffff' } },
       tooltip: {
         backgroundColor: '#252423',
         callbacks: {
